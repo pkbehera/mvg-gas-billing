@@ -14,7 +14,7 @@ Ruby code for generating monthly cooking gas consumption bills for Mont Vert Gra
   
     - Has anybody provided more than one reading in the current month?
   
-    - Has anybody not specified the decimal point in the readings, making the consumption very high?
+    - Has anybody missed the decimal point in the readings, making the consumption very high?
 
   - (optional) Sort all the above files in asscending order, Building first then flat number
 
