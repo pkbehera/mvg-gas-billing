@@ -9,11 +9,11 @@ Ruby code for generating monthly cooking gas consumption bills for Mont Vert Gra
   - Extract the KYC column and save it as `KYC.xls`
 
   - Extract the Occupancty column and save it as `OCC.xls`
-  
+
   - Extract the readings provided in the current month, after the last reading of last month, looking for the following errors and correcting them
-  
+
     - Has anybody provided more than one reading in the current month?
-  
+
     - Has anybody missed the decimal point in the readings, making the consumption very high?
 
   - (optional) Sort all the above files in asscending order, Building first then flat number
