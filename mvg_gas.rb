@@ -96,6 +96,7 @@ end
 
 #Read latest gas reading excel file
 puts 'Reading file ' + ARGV[2]
+count = 0
 book = Spreadsheet.open ARGV[2]
 sheet = book.worksheet 0
 row = sheet.row(0)
@@ -113,11 +114,13 @@ sheet.each do |row|
         puts 'ERROR - NEGATIVE CONSUMPTION FOUND, THERE IS SOMETHING WRONG WITH THE READINGS. CORRECT THE READINGS AND RETRY!'
         abort
     end
-    if consumed > 20 then
+    if consumed > 25 then
         puts "WARNING!! HIGH consumtion, #{consumed} m^3 found for #{block}-#{flat}! Continuing bill generation, but review the readings of this flat!"
     end
     Flat.set_consumption(block, flat, consumed)
+    count = count + 1
 end
+puts "Number of readings entered: #{count}"
 
 #Tests
 puts 'Checking data sanity...'
