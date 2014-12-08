@@ -20,7 +20,7 @@ class Flat
         @@flat_count
     end
     def Flat.check_sanity
-        if Flat.get_flat('A', 1001).to_s != 'A, 1001, true, true' or Flat.get_flat('C', 801).to_s != 'C, 801, true, true' or Flat.get_flat('E', 702).to_s != 'E, 702, true, true' or Flat.get_flat('A', 501).to_s != 'A, 501, false, true' or Flat.get_flat('B', 604).to_s != 'B, 604, true, true' then
+        if Flat.get_flat('A', 1001).to_s != 'A, 1001, true, true' or Flat.get_flat('C', 801).to_s != 'C, 801, true, true' or Flat.get_flat('E', 702).to_s != 'E, 702, true, true' or Flat.get_flat('A', 501).to_s != 'A, 501, false, true' or Flat.get_flat('B', 604).to_s != 'B, 604, false, true' then
             puts 'Something wrong, flat checks not working!'
             abort
         end
@@ -50,6 +50,9 @@ class Flat
     end
     def Flat.set_consumption(block, unitNo, consumed)
         flat = get_flat(block, unitNo)
+        if flat.reading_avlbl then
+            puts "WARNING!! more than one reading for for flat #{block}=#{unitNo}!"
+        end
         flat.consumed = consumed
         flat.reading_avlbl = true
     end
@@ -138,8 +141,8 @@ class Flat
         puts 'Date-Time Run: ' + time.day.to_s + '/' + time.month.to_s + '/' + time.year.to_s + '-' + time.hour.to_s + ':' + time.min.to_s
         puts "------------SETTINGS USED------------"
         puts "Mass conversion rate: #{VOL_MASS_RATIO} kg/m^3"
-        puts "Subsidised billing rate: Rs.#{SUBSIDISED_CHARGE_PER_KG} per kg"
-        puts "Commercial billing rate: Rs.#{COMMERCIAL_CHARGE_PER_KG} per kg"
+        puts "Subsidised billing rate: Rs. #{SUBSIDISED_CHARGE_PER_KG} per kg"
+        puts "Commercial billing rate: Rs. #{COMMERCIAL_CHARGE_PER_KG} per kg"
         puts "-------------------------------------"
         puts "#{kyc_flats} Flats have completed KYC formalities"
         puts "#{non_kyc_flats} Flats have NOT completed KYC formalities or unsubscribed"
@@ -157,8 +160,8 @@ class Flat
             puts "#{fined_no_payment} Flats were FINED for NOT paying their previous dues!"
         end
         puts "#{(unsub_flats + kyc_flats + non_kyc_flats)} Flats were processed in total"
-        puts "Total billed amount: Rs.#{total_billed_amount}"
-        puts "Total un-adjusted debit: Rs.#{total_unadjusted_debit}"
+        puts "Total billed amount: Rs. #{total_billed_amount}"
+        puts "Total un-adjusted debit: Rs. #{total_unadjusted_debit}"
         puts "-------------------------------------"
         #First 3 letters of a Month name
         cur_month = Date::MONTHNAMES[time.month][0..2]
