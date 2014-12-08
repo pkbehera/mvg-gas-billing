@@ -3,6 +3,9 @@ require 'rubygems'
 require 'spreadsheet'
 
 Spreadsheet.client_encoding = 'UTF-8'
+def format_comma(number)
+    return number.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
+end
 
 class Flat
     #Static map of all flats
@@ -160,8 +163,8 @@ class Flat
             puts "#{fined_no_payment} Flats were FINED for NOT paying their previous dues!"
         end
         puts "#{(unsub_flats + kyc_flats + non_kyc_flats)} Flats were processed in total"
-        puts "Total billed amount: Rs. #{total_billed_amount}"
-        puts "Total un-adjusted debit: Rs. #{total_unadjusted_debit}"
+        puts "Total billed amount: Rs. #{format_comma(total_billed_amount)}"
+        puts "Total un-adjusted debit: Rs. #{format_comma(total_unadjusted_debit)}"
         puts "-------------------------------------"
         #First 3 letters of a Month name
         cur_month = Date::MONTHNAMES[time.month][0..2]
