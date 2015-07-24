@@ -2,6 +2,7 @@
 #These may change every month
 VOL_MASS_RATIO = 2.26
 SUBSIDISED_CHARGE_PER_KG = 34.47
+NON_SUBSIDISED_CHARGE_PER_KG = 48.30
 #Used till Apr 2013 billing (done in May'13)
 #COMMERCIAL_CHARGE_PER_KG = 74.36
 #Used till Nov 2013 billing (done in Dec'13)
@@ -24,6 +25,7 @@ PENAL_INTEREST_NO_PAYMENTS = 2.00
 MIN_PENAL_INTEREST_NO_PAYMENTS = 50.00
 PENAL_INTEREST_THRESHOLD = 0.00
 ALLOW_REFUNDS = true
+ALLOW_NEGATIVE_READINGS = false
 
 #MVG FLATS
 MVG_ALL_BLOCKS = ['A', 'B', 'C', 'E']
@@ -43,8 +45,8 @@ DEBIT_COMMENT_UNSUBSCRIBED = 'No debit - Flat Un-Subscribed'
 DEBIT_COMMENT_NO_READING_KYC = 'No reading - flat debit'
 DEBIT_COMMENT_NO_READING_NO_KYC = 'No reading - flat debit, KYC NOT done'
 DEBIT_COMMENT_SUBSIDISED = 'Subsidised rate'
-DEBIT_COMMENT_PART_SUBSIDISED = 'Partly commercial rate, consumed beyond subsidy quota'
-DEBIT_COMMENT_COMMERCIAL_KYC = 'Commercial rate, consumed beyond subsidy quota'
+DEBIT_COMMENT_PART_SUBSIDISED = 'Partly non-subsidised rate, consumed beyond subsidy quota'
+DEBIT_COMMENT_NON_SUBSIDISED_KYC = 'Non-subsidised rate, consumed beyond subsidy quota'
 DEBIT_COMMENT_COMMERCIAL_NO_KYC = 'Commercial rate, KYC NOT done'
 
 #Constants for file containing KYC Values
