@@ -1,4 +1,5 @@
-require 'constants'
+scriptDir = File.dirname(__FILE__)
+require "#{scriptDir}/constants"
 require 'rubygems'
 require 'spreadsheet'
 
@@ -23,7 +24,7 @@ class Flat
         @@flat_count
     end
     def Flat.check_sanity
-        if Flat.get_flat('A', 1001).to_s != 'A, 1001, true, true' or Flat.get_flat('C', 801).to_s != 'C, 801, true, true' or Flat.get_flat('E', 702).to_s != 'E, 702, true, true' or Flat.get_flat('A', 501).to_s != 'A, 501, false, true' or Flat.get_flat('B', 604).to_s != 'B, 604, false, true' then
+        if Flat.get_flat('A', 1001).to_s != 'A, 1001, true, true' or Flat.get_flat('C', 801).to_s != 'C, 801, true, true' or Flat.get_flat('E', 702).to_s != 'E, 702, true, true' or Flat.get_flat('A', 501).to_s != 'A, 501, true, true' or Flat.get_flat('B', 604).to_s != 'B, 604, false, true' then
             puts 'Something wrong, flat checks not working!'
             abort
         end
@@ -145,6 +146,7 @@ class Flat
         puts "------------SETTINGS USED------------"
         puts "Mass conversion rate: #{VOL_MASS_RATIO} kg/m^3"
         puts "Subsidised billing rate: Rs. #{SUBSIDISED_CHARGE_PER_KG} per kg"
+        puts "Non-Subsidised billing rate: Rs. #{NON_SUBSIDISED_CHARGE_PER_KG} per kg"
         puts "Commercial billing rate: Rs. #{COMMERCIAL_CHARGE_PER_KG} per kg"
         puts "-------------------------------------"
         puts "#{kyc_flats} Flats have completed KYC formalities"
@@ -175,7 +177,6 @@ class Flat
         ledger_book.write ledger_file
         puts "Gas ledger written to (to be used as a input next month): #{ledger_file}"
     end
-
     attr_accessor :block, :unitNo, :consumed, :occupied, :subscribed, :kyc, :subsidy_used, :unacc_debit, :no_reading_cnt, :fined_no_reading, :outstanding, :fined_no_payment, :reading_avlbl, :debit_amt, :debit_comment, :to_s
     def to_s
         @block.to_s + ', ' + @unitNo.to_s + ', ' + @kyc.to_s + ', ' + @occupied.to_s
@@ -247,7 +248,7 @@ class Flat
                         @debit_comment = DEBIT_COMMENT_PART_SUBSIDISED
                     end
                     if rem_subsidy_kgs == 0.0 then
-                        @debit_comment = DEBIT_COMMENT_COMMERCIAL_KYC
+                        @debit_comment = DEBIT_COMMENT_NON_SUBSIDISED_KYC
                     end
                     @subsidy_used += subsidized_kgs
                 else
@@ -257,15 +258,17 @@ class Flat
                     non_subsidized_kgs = used_kgs
                     @debit_comment = DEBIT_COMMENT_COMMERCIAL_NO_KYC
                 end
-                @debit_amt = subsidized_kgs * SUBSIDISED_CHARGE_PER_KG + non_subsidized_kgs * COMMERCIAL_CHARGE_PER_KG
+                @debit_amt = subsidized_kgs * SUBSIDISED_CHARGE_PER_KG + (@kyc ? non_subsidized_kgs * NON_SUBSIDISED_CHARGE_PER_KG : non_subsidized_kgs * COMMERCIAL_CHARGE_PER_KG)
+
                 sub_com = (subsidized_kgs > 0 ? "#{(subsidized_kgs*1000).round/1000.0} kg * #{SUBSIDISED_CHARGE_PER_KG}" : '')
-                com_com = (non_subsidized_kgs > 0 ? "#{(non_subsidized_kgs*1000).round/1000.0} kg * #{COMMERCIAL_CHARGE_PER_KG}" : '')
+                non_sub_com = (non_subsidized_kgs > 0 ? "#{(non_subsidized_kgs*1000).round/1000.0} kg * #{@kyc ? NON_SUBSIDISED_CHARGE_PER_KG : COMMERCIAL_CHARGE_PER_KG}" : '')
                 comment = sub_com
-                if sub_com != '' && com_com != '' then
-                    comment = sub_com + ' + ' + com_com
+                if sub_com != '' && non_sub_com != '' then
+                    comment = sub_com + ' + ' + non_sub_com
                 elsif sub_com == '' then
-                    comment = com_com
+                    comment = non_sub_com
                 end
+
                 if comment != '' then
                     @debit_comment += ' [' + comment + ']'
                 end
