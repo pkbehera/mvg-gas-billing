@@ -11,7 +11,9 @@ Ruby code to generate monthly cooking gas consumption bills for Mont Vert Grande
     - Any other things trying to cheat the software?
   - (optional) Sort all the above files in asscending order, Building first then flat number
   - Use rvm (Ruby Version Manager) to use the system version of Ruby
+
         rvm use system
   - Go to the directory where the above files are stored
   - Execute the script `mvg_gas.rb` as follows
+
         mvg_gas.rb <optional parameter to redirect console messages to a file> 
