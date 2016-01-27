@@ -1,5 +1,5 @@
-mvg-gas-billing
-===============
+Mont Vert Grande CoOp Cooking Gas Billing
+==========================================
 Ruby code to generate monthly cooking gas consumption bills for Mont Vert Grande Cooperative Housing Society
 
 **Usage:**
