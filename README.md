@@ -9,7 +9,7 @@ Ruby code to generate monthly cooking gas consumption bills for Mont Vert Grande
     - Has anybody provided more than one reading in the current month?
     - Has anybody missed the decimal point in the readings, making the consumption very high?
     - Any other things trying to cheat the software?
-  - (optional) Sort all the above files in asscending order, Building first then flat number
+  - (optional) Sort all rows in the above files in asscending order, Building first then flat number
   - Use rvm (Ruby Version Manager) to use the system version of Ruby
 
         rvm use system
