@@ -10,31 +10,31 @@ reqDir = today.strftime("%b%Y")
 curMon = today.strftime("%b")
 curYr = today.strftime("%Y")
 
-preMonth = Time.local(today.year, (today.month - 1), today.day)
-preMonthDir = preMonth.strftime("%b%Y")
-preMonth = preMonth.strftime("%b_%Y")
+#Same date in last month
+prevMonth = today << 1
+preMonthDir = prevMonth.strftime("%b%Y")
+preMonth = prevMonth.strftime("%b_%Y")
+preMon = prevMonth.strftime("%b")
+preMonYr = prevMonth.strftime("%Y")
 
 if ! workDir.eql? reqDir then
    puts "This script should be run from a folder named #{reqDir}"
    abort
 end
 
-kycFile = "KYC.xls"
-if ! File.exist?(kycFile) then
-   puts "File #{kycFile} does not exist"
-   abort
-end
-
-occFile = "OCC.xls"
-if ! File.exist?(occFile) then
-   puts "File #{occFile} does not exist"
+kycOccFile = "KYC_OCC.xls"
+if ! File.exist?(kycOccFile) then
+   puts "File #{kycOccFile} does not exist"
    abort
 end
 
 rdngFilePat = "gasmeter_readings_{[0-3][0-9]}#{curMon}_to_{[0-3][0-9]}#{curMon}.xls"
+rdngFilePat1 = "gasmeter_readings_{[0-3][0-9]}#{preMon}_to_{[0-3][0-9]}#{curMon}.xls"
+
 list = Dir.glob(rdngFilePat)
+list += (Dir.glob(rdngFilePat1))
 if list.empty? then
-   puts "Current month readings file of pattern #{rdngFilePat} does not exist"
+   puts "Current month readings file of pattern #{rdngFilePat} or #{rdngFilePat1} does not exist"
    abort
 else
    if list.size > 1 then
@@ -44,7 +44,7 @@ else
    rdngFile = list[0]
 end
 
-ledgFile = "../#{preMonthDir}/Gas_Ledger_#{preMonth}.xls"
+ledgFile = "../../#{preMonYr}/#{preMonthDir}/Gas_Ledger_#{preMonth}.xls"
 if ! File.exist?(ledgFile) then
    puts "File #{ledgFile} does not exist"
    abort
@@ -64,20 +64,19 @@ puts "Current working directory #{cwd}"
 NUM_ARGS = 4
 if ARGV.length != NUM_ARGS then
    puts "Requires exactly #{NUM_ARGS} arguemnts"
-   #puts "Usage: #{$0} KYC_file Occupancy_file latest_reading_file gas_ledger_file outstanding_file"
-   puts "Usage: #{$0} KYC_file Occupancy_file latest_reading_file gas_ledger_file"
+   #puts "Usage: #{$0} KYC_file latest_reading_file gas_ledger_file outstanding_file"
+   puts "Usage: #{$0} KYC_file latest_reading_file gas_ledger_file"
    abort
 end
 
-kycFile = ARGV[0]
-occFile = ARGV[1]
-rdngFile = ARGV[2]
-ledgFile = ARGV[3]
-outsdFile = ARGV[4]
+kycOccFile = ARGV[0]
+rdngFile = ARGV[1]
+ledgFile = ARGV[2]
+outsdFile = ARGV[3]
 '''
 
-#if kycFile.split(".").last != 'xls' or occFile.split(".").last != 'xls' or rdngFile.split(".").last != 'xls' or ledgFile.split(".").last != 'xls' or outsdFile.split(".").last != 'xls' then
-if kycFile.split(".").last != 'xls' or occFile.split(".").last != 'xls' or rdngFile.split(".").last != 'xls' or ledgFile.split(".").last != 'xls' then
+#if kycOccFile.split(".").last != 'xls' or rdngFile.split(".").last != 'xls' or ledgFile.split(".").last != 'xls' or outsdFile.split(".").last != 'xls' then
+if kycOccFile.split(".").last != 'xls' or rdngFile.split(".").last != 'xls' or ledgFile.split(".").last != 'xls' then
     puts "Can not process file formats other than .xls (Excel 97-2003), save the files as .xls and retry."
     abort
 end
@@ -101,12 +100,12 @@ if MVG_TOTAL_NUMBER_OF_FLATS != count then
 end
 
 #Read KYC excel file
-puts 'Reading file ' + kycFile
-book = Spreadsheet.open kycFile
+puts 'Reading file ' + kycOccFile
+book = Spreadsheet.open kycOccFile
 sheet = book.worksheet 0
 row = sheet.row(0)
-if row[KYC_BLOCK_COL_NO] != KYC_BLOCK_COL_HEADING or KYC_KYC_COL_HEADING != row[KYC_KYC_COL_NO] then
-    puts 'The format of the KYC Excel file ' + kycFile + ' does not seems to be correct, check the file and retry!'
+if row[KYC_BLOCK_COL_NO] != KYC_BLOCK_COL_HEADING or KYC_KYC_COL_HEADING != row[KYC_KYC_COL_NO] or OCC_OCC_COL_HEADING != row[OCC_OCC_COL_NO] then
+    puts 'The format of the KYC/Occupancy Excel file ' + kycOccFile + ' does not seems to be correct, check the file and retry!'
     abort
 end
 num_flats = 0
@@ -124,40 +123,18 @@ sheet.each do |row|
         kyc = true
     end
     Flat.set_kyc_subscried(block, flat, subscribed, kyc)
-    num_flats += 1
-end
-count = Flat.get_flat_count
-if MVG_TOTAL_NUMBER_OF_FLATS != count || MVG_TOTAL_NUMBER_OF_FLATS != num_flats then
-    puts 'ERROR - the total number of flats ' + MVG_TOTAL_NUMBER_OF_FLATS.to_s + ' does NOT match with ' + count.to_s + ' records in the KYC file!!'
-    abort
-end
-
-#Read Occupancy excel file
-puts 'Reading file ' + occFile
-book = Spreadsheet.open occFile
-sheet = book.worksheet 0
-row = sheet.row(0)
-if row[OCC_BLOCK_COL_NO] != OCC_BLOCK_COL_HEADING or OCC_OCC_COL_HEADING != row[OCC_OCC_COL_NO] then
-    puts 'The format of the Occupancy Excel file ' + occFile + ' does not seems to be correct, check the file and retry!'
-    abort
-end
-num_flats = 0
-sheet.each do |row|
-    break if row.join('').empty?
-    next if OCC_BLOCK_COL_HEADING == row[OCC_BLOCK_COL_NO]
-    block = row[OCC_BLOCK_COL_NO]
-    flat = row[OCC_FLAT_COL_NO].to_i
+    #Read Occupancy flag
     occ = true
     occ_s = row[OCC_OCC_COL_NO]
     if not occ_s.nil? and OCC_UNOCC_STRING_DOWNCASE == occ_s.strip.downcase then
         occ = false
     end
-    num_flats += 1
     Flat.set_occ(block, flat, occ)
+    num_flats += 1
 end
 count = Flat.get_flat_count
 if MVG_TOTAL_NUMBER_OF_FLATS != count || MVG_TOTAL_NUMBER_OF_FLATS != num_flats then
-    puts 'ERROR - the total number of flats ' + MVG_TOTAL_NUMBER_OF_FLATS.to_s + ' does NOT match with ' + count.to_s + 'records in the Occupancy file!'
+    puts 'ERROR - the total number of flats ' + MVG_TOTAL_NUMBER_OF_FLATS.to_s + ' does NOT match with ' + count.to_s + ' records in the KYC file!!'
     abort
 end
 
