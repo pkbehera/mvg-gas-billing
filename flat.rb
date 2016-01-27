@@ -123,7 +123,7 @@ class Flat
             total_unadjusted_debit += flat.unacc_debit
             #if flat.debit_amt > 0 then
                 row_debit += 1
-                debit_sheet.row(row_debit).push(flat.block).push(flat.unitNo).push(flat.debit_amt).push(OUTPUT_AC_HEAD_COL_VAL).push(flat.debit_comment)
+                debit_sheet.row(row_debit).push(flat.block).push(flat.unitNo.to_s()).push(flat.debit_amt).push(OUTPUT_AC_HEAD_COL_VAL).push(flat.debit_comment)
             #end
             #There must be an entry for each flat in the ledger
             row_ledger += 1
@@ -217,6 +217,7 @@ class Flat
         @fined_no_reading = false
         @outstanding = 0.0
         @fined_no_payment= false
+        @bill_me = false
     end
 
     def calculate
@@ -226,11 +227,13 @@ class Flat
             @debit_comment = DEBIT_COMMENT_UNSUBSCRIBED
         end
         adjust_amt = 0.0
-        if @reading_avlbl and @consumed > 0.0 then
-            @occupied = true
-            @subscribed = true
-        end
         if @occupied && @subscribed then
+            @bill_me = true
+        end
+        if @reading_avlbl and @consumed > 0.0 then
+            @bill_me = true
+        end
+        if @bill_me then
             if @reading_avlbl then
                 @no_reading_cnt = 0
                 used_kgs = consumed * VOL_MASS_RATIO
@@ -256,12 +259,12 @@ class Flat
                     #This is to provide pro-rated subsidy to people who do their KYC in the middle of the financial year
                     @subsidy_used += SUBSIDY_PER_MONTH
                     non_subsidized_kgs = used_kgs
-                    @debit_comment = DEBIT_COMMENT_COMMERCIAL_NO_KYC
+                    @debit_comment = @subscribed ? DEBIT_COMMENT_NON_SUBSIDISED_NO_KYC : DEBIT_COMMENT_COMMERCIAL_UNSUBSCRIBED
                 end
-                @debit_amt = subsidized_kgs * SUBSIDISED_CHARGE_PER_KG + (@kyc ? non_subsidized_kgs * NON_SUBSIDISED_CHARGE_PER_KG : non_subsidized_kgs * COMMERCIAL_CHARGE_PER_KG)
+                @debit_amt = subsidized_kgs * SUBSIDISED_CHARGE_PER_KG + non_subsidized_kgs * (@subscribed ? NON_SUBSIDISED_CHARGE_PER_KG : COMMERCIAL_CHARGE_PER_KG)
 
                 sub_com = (subsidized_kgs > 0 ? "#{(subsidized_kgs*1000).round/1000.0} kg * #{SUBSIDISED_CHARGE_PER_KG}" : '')
-                non_sub_com = (non_subsidized_kgs > 0 ? "#{(non_subsidized_kgs*1000).round/1000.0} kg * #{@kyc ? NON_SUBSIDISED_CHARGE_PER_KG : COMMERCIAL_CHARGE_PER_KG}" : '')
+                non_sub_com = (non_subsidized_kgs > 0 ? "#{(non_subsidized_kgs*1000).round/1000.0} kg * #{@subscribed ? NON_SUBSIDISED_CHARGE_PER_KG : COMMERCIAL_CHARGE_PER_KG}" : '')
                 comment = sub_com
                 if sub_com != '' && non_sub_com != '' then
                     comment = sub_com + ' + ' + non_sub_com
@@ -291,10 +294,10 @@ class Flat
             else
                 @no_reading_cnt += 1
                 if @kyc then
-                    @debit_amt = NO_READING_SUBSIDISED_DEBIT
+                    @debit_amt = NO_READING_KYC_DEBIT
                     @debit_comment = DEBIT_COMMENT_NO_READING_KYC
                 else
-                    @debit_amt = NO_READING_COMMERCIAL_DEBIT
+                    @debit_amt = NO_READING_NO_KYC_DEBIT
                     @debit_comment = DEBIT_COMMENT_NO_READING_NO_KYC
                     #Provide pro-rated subsidy to people who complete KYC in the middle of a financial year
                     @subsidy_used += SUBSIDY_PER_MONTH
