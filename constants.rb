@@ -14,8 +14,8 @@ COMMERCIAL_CHARGE_PER_KG = 83.90
 #TOTAL_SUBSIDY_PER_YR_KGS = 14.10 * 9
 TOTAL_SUBSIDY_PER_YR_KGS = 14.10 * 12
 SUBSIDY_PER_MONTH = TOTAL_SUBSIDY_PER_YR_KGS / 12.00
-NO_READING_SUBSIDISED_DEBIT = 300.00
-NO_READING_COMMERCIAL_DEBIT = 600.00
+NO_READING_KYC_DEBIT  = 300.00
+NO_READING_NO_KYC_DEBIT  = 600.00
 NO_READING_NO_FINE_CYCLES = 3
 NO_READING_FINE_AMT = 50.00
 APPLY_FINE_NO_READING_DEFAULTS = true
@@ -47,21 +47,18 @@ DEBIT_COMMENT_NO_READING_NO_KYC = 'No reading - flat debit, KYC NOT done'
 DEBIT_COMMENT_SUBSIDISED = 'Subsidised rate'
 DEBIT_COMMENT_PART_SUBSIDISED = 'Partly non-subsidised rate, consumed beyond subsidy quota'
 DEBIT_COMMENT_NON_SUBSIDISED_KYC = 'Non-subsidised rate, consumed beyond subsidy quota'
-DEBIT_COMMENT_COMMERCIAL_NO_KYC = 'Commercial rate, KYC NOT done'
+DEBIT_COMMENT_NON_SUBSIDISED_NO_KYC = 'Non-subsidised rate, KYC NOT done'
+DEBIT_COMMENT_COMMERCIAL_UNSUBSCRIBED = 'Commercial rate, flat unsubscribed but consuming gas!'
 
 #Constants for file containing KYC Values
 KYC_BLOCK_COL_NO = 1 #Column B
 KYC_FLAT_COL_NO = 2  #Column C
 KYC_KYC_COL_NO = 3   #Column D
+OCC_OCC_COL_NO = 4   #Column E
 KYC_KYC_COL_HEADING = 'KYC Status'
 KYC_KYC_OK_STRING_DOWNCASE = 'yes'
 KYC_BLOCK_COL_HEADING = 'Block'
 KYC_FLAT_COL_HEADING = 'Unit No.'
-
-#Constants for file containing Occupancy Values
-OCC_BLOCK_COL_NO = 1 #Column B
-OCC_FLAT_COL_NO = 2  #Column C
-OCC_OCC_COL_NO = 3   #Column D
 OCC_OCC_COL_HEADING = 'Occupancy Status'
 OCC_UNOCC_STRING_DOWNCASE = 'unoccupied'
 OCC_BLOCK_COL_HEADING = KYC_BLOCK_COL_HEADING
