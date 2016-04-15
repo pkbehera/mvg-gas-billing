@@ -5,7 +5,7 @@ require 'spreadsheet'
 
 Spreadsheet.client_encoding = 'UTF-8'
 def format_comma(number)
-    return number.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
+    return sprintf('%.2f', number).reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
 end
 
 class Flat
@@ -142,7 +142,7 @@ class Flat
             abort
         end
         time = Time.new
-        puts 'Date-Time Run: ' + time.day.to_s + '/' + time.month.to_s + '/' + time.year.to_s + '-' + time.hour.to_s + ':' + time.min.to_s
+        puts 'Run Date-Time: ' + time.day.to_s.rjust(2, "0") + '/' + time.month.to_s.rjust(2, "0") + '/' + time.year.to_s.rjust(4, "0") + '-' + time.hour.to_s.rjust(2, "0") + ':' + time.min.to_s.rjust(2, "0")
         puts "------------SETTINGS USED------------"
         puts "Mass conversion rate: #{VOL_MASS_RATIO} kg/m^3"
         puts "Subsidised billing rate: Rs. #{SUBSIDISED_CHARGE_PER_KG} per kg"
@@ -352,3 +352,4 @@ class Flat
         end
     end
 end
+
