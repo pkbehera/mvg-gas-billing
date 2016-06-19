@@ -24,7 +24,7 @@ class Flat
         @@flat_count
     end
     def Flat.check_sanity
-        if Flat.get_flat('A', 1001).to_s != 'A, 1001, true, true' or Flat.get_flat('C', 801).to_s != 'C, 801, true, true' or Flat.get_flat('E', 702).to_s != 'E, 702, true, true' or Flat.get_flat('A', 501).to_s != 'A, 501, true, true' or Flat.get_flat('B', 604).to_s != 'B, 604, false, true' then
+        if Flat.get_flat('A', 1001).to_s != 'A, 1001, true, true' or Flat.get_flat('C', 801).to_s != 'C, 801, true, true' or Flat.get_flat('E', 702).to_s != 'E, 702, true, true' or Flat.get_flat('A', 501).to_s != 'A, 501, true, true' or Flat.get_flat('B', 604).to_s != 'B, 604, true, true' then
             puts 'Something wrong, flat checks not working!'
             abort
         end
@@ -352,4 +352,3 @@ class Flat
         end
     end
 end
-
