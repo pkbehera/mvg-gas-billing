@@ -230,7 +230,7 @@ class Flat
         if @occupied && @subscribed then
             @bill_me = true
         end
-        if @reading_avlbl and @consumed > 0.0 then
+        if @reading_avlbl and @consumed != 0.0 then
             @bill_me = true
         end
         if @bill_me then

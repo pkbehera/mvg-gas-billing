@@ -160,7 +160,7 @@ sheet.each do |row|
         negCount = negCount + 1
     end
     if consumed > 25 then
-        puts "WARNING!! HIGH consumtion, #{consumed} m^3 found for #{block}-#{flat}! Continuing bill generation, but review the readings of this flat!"
+        puts "WARNING!! HIGH consumtion, #{consumed.round(3)} m^3 found for #{block}-#{flat}! Continuing bill generation, but review the readings of this flat!"
     end
     if negCount > 0 then
         if ALLOW_NEGATIVE_READINGS != true then
