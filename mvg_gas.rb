@@ -148,33 +148,34 @@ if row[READING_BLOCK_COL_NO] != READING_BLOCK_COL_HEADING or READING_CONS_COL_HE
     puts 'The format of the reading Excel file ' + rdngFile + ' does not seems to be correct, check the file and retry!'
     abort
 end
+negCount = 0;
 sheet.each do |row|
     break if row.join('').empty?
     next if READING_BLOCK_COL_HEADING == row[READING_BLOCK_COL_NO]
     block = row[READING_BLOCK_COL_NO]
     flat = row[READING_FLAT_COL_NO].to_i
     consumed = row[READING_CONS_COL_NO].to_f
-    negCount = 0;
     if consumed < 0 then
         puts "ERROR - NEGATIVE CONSUMPTION FOUND FOR #{block}-#{flat}!"
         negCount = negCount + 1
     end
-    if consumed > 25 then
-        puts "WARNING!! HIGH consumtion, #{consumed.round(3)} m^3 found for #{block}-#{flat}! Continuing bill generation, but review the readings of this flat!"
-    end
-    if negCount > 0 then
-        if ALLOW_NEGATIVE_READINGS != true then
-            puts 'NEGATIVE READINGS FOUND, THERE IS SOMETHING WRONG WITH THE READINGS. CORRECT THE READINGS AND RETRY'
-            abort
-        else
-            puts "Continuing bill generation, but review the readings of these flats!"
-        end
+    if consumed > HIGH_CONS_WARN then
+        puts "WARNING!! - HIGH consumtion, #{consumed.round(3)} m^3 found for #{block}-#{flat}! Continuing bill generation, but review the readings of this flat!"
     end
     Flat.set_consumption(block, flat, consumed)
     count = count + 1
 end
 puts "Number of readings entered: #{count}"
-
+if negCount > 0 then
+    if ALLOW_NEGATIVE_READINGS != true then
+        puts 'NEGATIVE READINGS FOUND, THERE IS SOMETHING WRONG WITH THE READINGS. CORRECT THE READINGS AND RETRY'
+        abort
+    else
+        puts ""
+        puts "WARNING!! - NEGATIVE READINGS FOUND, Continuing bill generation, but review the readings of these flats!"
+    end
+end
+ 
 #Tests
 puts 'Checking data sanity...'
 Flat.check_sanity
